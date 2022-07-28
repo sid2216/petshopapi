@@ -15,6 +15,7 @@ class CategoryController extends Controller
              $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
+            }
             $slug =str_replace(" ","-",$request->title);
     		$category_create = Category::create(['title'=>$request->title,
     	                                         'slug'=>$slug]);
@@ -37,7 +38,7 @@ class CategoryController extends Controller
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
                   }
                 $category_update = Category::find('uuid',$uuid);
-                $category_update->title = $request->tilte;
+                $category_update->title = $request->title;
                 $category_update->slug=str_replace(" ","-",$request->title);
                 $category_update->save();
                 return response()->json(['status'=>'success','category'=>$category_update,'message'=>'category updated successfully']);
@@ -73,9 +74,8 @@ class CategoryController extends Controller
     {
     	try{
              $category = Category::all()->orderBy('title')->paginate(10);
-             $category->delete();
               return response()->json(['status'=>'success',
-                                         'message'=>'category deleted succefully']);
+                                         'category'=>$category]);
          }catch(Exception $e){
              dd($e);
          }
