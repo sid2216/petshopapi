@@ -39,10 +39,10 @@ Route::post('api/v1/user/reset-password-token','UserController@reset_password_to
 Route::put('api/v1/user/edit','UserController@edit_user');*/
 //category route
 Route::get('/v1/categories','App\Http\Controllers\CategoryController@category_index');
-Route::post('/v1/category/create','CategoryController@create');
-Route::put('/v1/category/{uuid}','CategoryController@edit_category');
-Route::get('/v1/category/{uuid}','CategoryController@category_show');
-Route::delete('/v1/category/{uuid}','CategoryController@delete_category');
+Route::post('/v1/category/create','App\Http\Controllers\CategoryController@create');
+Route::put('/v1/category/{uuid}','App\Http\Controllers\CategoryController@edit_category');
+Route::get('/v1/category/{uuid}','App\Http\Controllers\CategoryController@category_show');
+Route::delete('/v1/category/{uuid}','App\Http\Controllers\CategoryController@delete_category');
 /*//Main Page route
 Route::get('api/v1/main/blog','MainPageController@index_promotions');
 Route::get('api/v1/main/blog/{uuid}','MainPageController@index_blog');
