@@ -6,8 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use App\User;
+use App\Models\User;
 use App\Files;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
@@ -18,6 +19,7 @@ class AdminController extends Controller
 
     public function login(Request $request)
     {
+        try{
      $rules = array(
                 'email' => 'required|email',
                 'password' => 'required',
@@ -44,6 +46,9 @@ class AdminController extends Controller
             	       'type'=>'Bearer']
             	   ]);
 
+            }
+            }catch(Exception $e){
+                dd($e);
             }   
     }
 
@@ -56,44 +61,45 @@ class AdminController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+
        $rules = array(
-                'email' => 'required|email',
-                'password' => 'required',
                 'first_name'=>'required',
                 'last_name'=>'required',
                 'address'=>'required',
                 'avatar'=>'required',
                 'phone_number'=>'required',
+                'email' => 'required|email',
+                'password' => 'required',
                 'password_confirmation'=>'required|same:password'
             );
 
-
+           
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
 
             }
-            $filename='';
-            if($request->hasfile('avatar')) 
-            { 
-              $file = $request->file('avatar');
-              $extension = $file->getClientOriginalExtension(); // getting image extension
-              $size=$file->getSize()
-              $filename =time().'.'.$extension;
-              $path = public_path().'/admin/images/';
-              $uuid = Str::uuid()->toString();
-              $file->move($path, $filename);
+            // $filename='';
+            // if($request->hasfile('avatar')) 
+            // { 
+            //   $file = $request->file('avatar');
+            //   $extension = $file->getClientOriginalExtension(); // getting image extension
+            //   $size=$file->getSize()
+            //   $filename =time().'.'.$extension;
+            //   $path = public_path().'/admin/images/';
+            //   $uuid = Str::uuid()->toString();
+            //   $file->move($path, $filename);
 
-            }
+            // }
            $user_create = User::create([
            	'first_name'=>$request->first_name,
             'last_name' =>$request->last_name,
             'email'=>$request->email,
             'password'=>$request->password,
              'address'=>$request->address,
-             'avatar'=>$avatar_id,
+             'avatar'=>1,
              'phone_number'=>$request->phone_number,
              'is_admin'=>0,
              'is_marketing'=>0

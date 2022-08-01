@@ -19,15 +19,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //admin routes
-Route::post('api/v1/admin/create','AdminController@create');
-Route::post('api/v1/admin/login','AdminController@login');
-Route::post('api/v1/admin/logout','AdminController@logout');
-Route::get('api/v1/admin/user-listing','AdminController@user_listing');
-Route::put('api/v1/admin/user-edit/{uuid}','AdminController@edit_user');
-Route::delete('api/v1/admin/user-delete/{uuid}','AdminController@destroy');
+Route::post('/v1/admin/create','App\Http\Controllers\AdminController@create');
+Route::get('/v1/admin/login','App\Http\Controllers\AdminController@login')->name('login');
+Route::post('/api/v1/admin/logout','AdminController@logout');
+Route::get('/api/v1/admin/user-listing','AdminController@user_listing');
+Route::put('/api/v1/admin/user-edit/{uuid}','AdminController@edit_user');
+Route::delete('/api/v1/admin/user-delete/{uuid}','AdminController@destroy');
 //user routes
-Rout::get('api/v1/user','UserController@show');
-Route::delete('api/v1/user','UserController@destroy');
+//Rout::get('api/v1/user','UserController@show');
+/*Route::delete('api/v1/user','UserController@destroy');
 Route::get('api/v1/user/orders','UserController@_user_orders');
 Route::post('api/v1/user/create','UserController@create');
 Route::post('api/v1/user/forgot-password','UserController@forget_password');
@@ -57,5 +57,5 @@ Route::get('api/v1/brands','BrandController@brand_index');
 Route::post('api/v1/brand/create','BrandController@create');
 Route::put('api/v1/brand/{uuid}','BrandController@edit_brand');
 Route::get('api/v1/brand/{uuid}','BrandController@brand_show');
-Route::delete('api/v1/brand/{uuid}','BrandController@delete_brand');
+Route::delete('api/v1/brand/{uuid}','BrandController@delete_brand');*/
 //
