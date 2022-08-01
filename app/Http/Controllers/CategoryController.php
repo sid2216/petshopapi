@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 class CategoryController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
     public function create(Request $request)
     {
     	try{
@@ -25,7 +30,7 @@ class CategoryController extends Controller
              dd($e);
     	}
     }
-    }
+    
 
     public function edit_category($uuid)
     {
@@ -73,7 +78,7 @@ class CategoryController extends Controller
     public function category_index()
     {
     	try{
-             $category = Category::all()->orderBy('title')->paginate(10);
+             $category = Category::orderBy('title')->paginate(10);
               return response()->json(['status'=>'success',
                                          'category'=>$category]);
          }catch(Exception $e){

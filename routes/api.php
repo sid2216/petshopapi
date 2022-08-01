@@ -19,12 +19,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //admin routes
-Route::post('/v1/admin/create','App\Http\Controllers\AdminController@create');
-Route::get('/v1/admin/login','App\Http\Controllers\AdminController@login')->name('login');
-Route::post('/api/v1/admin/logout','AdminController@logout');
-Route::get('/api/v1/admin/user-listing','AdminController@user_listing');
-Route::put('/api/v1/admin/user-edit/{uuid}','AdminController@edit_user');
-Route::delete('/api/v1/admin/user-delete/{uuid}','AdminController@destroy');
+Route::post('/v1/admin/login','App\Http\Controllers\AdminController@login');
+Route::post('/v1/admin/create','App\Http\Controllers\AdminController@register');
+
+Route::post('/v1/admin/logout','App\Http\Controllers\AdminController@admin_logout');
+Route::get('/v1/admin/user-listing','App\Http\Controllers\AdminController@user_listing');
+Route::put('/v1/admin/user-edit/{uuid}','App\Http\Controllers\AdminController@edit_user');
+Route::delete('/v1/admin/user-delete/{uuid}','App\Http\Controllers\AdminController@destroy');
+
 //user routes
 //Rout::get('api/v1/user','UserController@show');
 /*Route::delete('api/v1/user','UserController@destroy');
@@ -34,14 +36,14 @@ Route::post('api/v1/user/forgot-password','UserController@forget_password');
 Route::post('api/v1/user/login','UserController@login');
 Route::post('api/v1/user/logout','UserController@logout');
 Route::post('api/v1/user/reset-password-token','UserController@reset_password_token');
-Route::put('api/v1/user/edit','UserController@edit_user');
+Route::put('api/v1/user/edit','UserController@edit_user');*/
 //category route
-Route::get('api/v1/categories','CategoryController@category_index');
-Route::post('api/v1/category/create','CategoryController@create');
-Route::put('api/v1/category/{uuid}','CategoryController@edit_category');
-Route::get('api/v1/category/{uuid}','CategoryController@category_show');
-Route::delete('api/v1/category/{uuid}','CategoryController@delete_category');
-//Main Page route
+Route::get('/v1/categories','App\Http\Controllers\CategoryController@category_index');
+Route::post('/v1/category/create','CategoryController@create');
+Route::put('/v1/category/{uuid}','CategoryController@edit_category');
+Route::get('/v1/category/{uuid}','CategoryController@category_show');
+Route::delete('/v1/category/{uuid}','CategoryController@delete_category');
+/*//Main Page route
 Route::get('api/v1/main/blog','MainPageController@index_promotions');
 Route::get('api/v1/main/blog/{uuid}','MainPageController@index_blog');
 Route::get(' api/v1/main/promotions','MainPageController@show_post');
