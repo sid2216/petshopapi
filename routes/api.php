@@ -52,12 +52,12 @@ Route::post('api/v1/product/create','ProductController@create');
 Route::put('api/v1/product/{uuid}','ProductController@edit_product');
 Route::get('api/v1/product/{uuid}','ProductController@product_show');
 Route::delete('api/v1/product/{uuid}','ProductController@delete_product');
-Route::get('api/v1/products','ProductController@category_index');
+Route::get('api/v1/products','ProductController@category_index');*/
 //order route
 //brand route
-Route::get('api/v1/brands','BrandController@brand_index');
-Route::post('api/v1/brand/create','BrandController@create');
-Route::put('api/v1/brand/{uuid}','BrandController@edit_brand');
-Route::get('api/v1/brand/{uuid}','BrandController@brand_show');
-Route::delete('api/v1/brand/{uuid}','BrandController@delete_brand');*/
+Route::get('/v1/brands','App\Http\Controllers\BrandController@brand_index');
+Route::post('/v1/brand/create','App\Http\Controllers\BrandController@create');
+Route::put('/v1/brand/{uuid}','App\Http\Controllers\BrandController@edit_brand');
+Route::get('/v1/brand/{uuid}','App\Http\Controllers\BrandController@brand_show');
+Route::delete('/v1/brand/{uuid}','App\Http\Controllers\BrandController@delete_brand');
 //
