@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Brand;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use URL;
 
 class BrandController extends Controller
 {
@@ -57,6 +58,7 @@ class BrandController extends Controller
     public function brand_show($uuid)
     {
          try{
+            
              $brand = Brand::where('uuid',$uuid)->first();
               return response()->json(['status'=>'success',
                                          'brand'=>$brand]);
@@ -80,6 +82,7 @@ class BrandController extends Controller
     public function brand_index()
     {
     	try{
+
              $brand = Brand::orderBy('title')->paginate(10);
               return response()->json(['status'=>'success',
                                          'brand'=>$brand]);

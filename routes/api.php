@@ -54,6 +54,13 @@ Route::get('api/v1/product/{uuid}','ProductController@product_show');
 Route::delete('api/v1/product/{uuid}','ProductController@delete_product');
 Route::get('api/v1/products','ProductController@category_index');*/
 //order route
+Route::get('/v1/orders','App\Http\Controllers\OrderController@all_order_list');
+Route::get('/v1/orders/shipment-locator','App\Http\Controllers\OrderController@shipment_locator');
+Route::get('/v1/orders/dashboard','App\Http\Controllers\OrderController@dashboard_order');
+// Route::post('/v1/brand/create','App\Http\Controllers\OrderController@create');
+// Route::put('/v1/brand/{uuid}','App\Http\Controllers\OrderController@edit_brand');
+// Route::get('/v1/brand/{uuid}','App\Http\Controllers\OrderController@brand_show');
+// Route::delete('/v1/brand/{uuid}','App\Http\Controllers\OrderController@delete_brand')
 //brand route
 Route::get('/v1/brands','App\Http\Controllers\BrandController@brand_index');
 Route::post('/v1/brand/create','App\Http\Controllers\BrandController@create');

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -22,12 +24,15 @@ class ProductController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
+            $uuid = Str::uuid(10)->toString();
+            $metadata = json_encode($request->metadata);
     		$category_create = Product::create([
+                'uuid'=>$uuid,
     			'category_uuid'=>$request->category_uuid
     		    'title'=>$request->title,
     	        'price'=>$request->price,
     	        'description'=>$request->description,
-    	         'metadata'=>$request->metadata
+    	         'metadata'=>$metadata
     	     ]);
             return response()->json(['status'=>'success',
                                       'message'=>'product created succesfully']);  
@@ -37,7 +42,7 @@ class ProductController extends Controller
     }
     }
 
-    public function edit_product($uuid)
+    public function edit_product(Request $request,$uuid)
     {
     	try{
              $rules = array(
@@ -50,12 +55,12 @@ class ProductController extends Controller
              $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
-            }
-                $product_update = Product::find('uuid',$uuid);
+            } $metadata = json_encode($request->metadata);
+                $product_update = Product::where('uuid',$uuid)->first();
                 $product_update->title = $request->title;
                 $product_update->price=$request->price;
                 $product_update->description=$request->description;
-                $product_update->metadata=$request->metadata;
+                $product_update->metadata=$metadata;
                 $product_update->save();
                 return response()->json(['status'=>'success','category'=>$category_update,'message'=>'category updated successfully']);
     	}catch(Exception $e){
@@ -66,7 +71,7 @@ class ProductController extends Controller
     public function product_show($uuid)
     {
          try{
-             $product = Product::find('uuid',$uuid);
+             $product = Product::where('uuid',$uuid)->first();
               return response()->json(['status'=>'success',
                                          'product'=>$product]);
          }catch(Exception $e){
@@ -77,7 +82,7 @@ class ProductController extends Controller
     public function delete_product($uuid)
     {
     	try{
-             $product = Product::find('uuid',$uuid);
+             $product = Product::where('uuid',$uuid)->first();
              $product->delete();
               return response()->json(['status'=>'success',
                                          'message'=>'category deleted succefully']);
@@ -89,7 +94,7 @@ class ProductController extends Controller
     public function category_index()
     {
     	try{
-             $product = Product::all()->orderBy('title')->paginate(10);
+             $product = Product::orderBy('title')->paginate(10);
              
               return response()->json(['status'=>'success',
                                          'product'=>$product]);

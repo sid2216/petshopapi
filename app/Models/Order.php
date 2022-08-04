@@ -11,11 +11,11 @@ class Order extends Model
 
     public function users()
     {
-    	$this->belongsTo(User::class);
+    	return $this->belongsToMany(User::class);
     }
 
     public function order_statuses()
     {
-    	$this->hasMany(Order_status::class);
+    	return $this->hasMany(Order_status::class);
     }
 }
