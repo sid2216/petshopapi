@@ -24,35 +24,38 @@ class OrderController extends Controller
     }
     public function shipment_locator()
     {
-    	try{
+    	try{ 
         $puuid=[];
-             $order = User::with(['orders' => function ($query) {
-        $query->select('orders.uuid','user_id','products->product as puuid','products->quantity as quantity','order_status_id');
-                  }])->get();
+                 $order=Order::where('order_status_id','4')
+                    ->join('users','orders.user_id','=','users.id')
+                     ->get();
              foreach ($order as $key => $value) {
-              foreach ($value['orders'] as $key1 => $value1) {
-                $puuid[]=$value1->puuid;
-              }
-                
-             }
+                       if(is_array(json_decode($value->products))){
+                        foreach (json_decode($value->products) as $key1 => $value1) {
+                          $puuid[]=$value1->product;
+                        }
+                       }
+                     }
+       
              $category=DB::table('products')->select('categories.title','products.uuid')
                              ->join('categories','products.category_id','=','categories.id')->whereIn('products.uuid',$puuid)->get();
-                               
-                               foreach ($order as $key3 => $value4) {
-                                 foreach ($value4['orders'] as $key5 => $value5) {
-                                    foreach ($category as $key2 => $value2) {
-
-                                       if($value5->puuid==$value2->uuid){
-                                        //dd($value5->puuid);
-                                        $value4['orders'][$key3]['title']=$value2->title;
-                                       }
-                                }     
+                              
+                               foreach ($order as $key2 => $value2) {
+                                foreach (json_decode($value2->products) as $key4 => $value4) {
+                                  foreach ($category as $key3 => $value3) {
+                                    if($value4==$value3->title){
+                                      $order[$key2]['category']=$value3->title;
+                                    }
+                                 }}
+                                
+                                   
                                }
-                             }
+                               //dd($order);
+
              return response()->json(['status'=>'success',
                                     'order'=>$order]);
     	}catch(Exception $e){
-
+         
     	}
     }
     public function dashboard_order()
@@ -85,6 +88,11 @@ class OrderController extends Controller
                }
                  $address_arr = ['address'=>$request->address,'city'=>$request->city,'state'=>$request->state,'zip'=>$request->zip,'country'=>$request->country];        
     		$address=json_encode($address_arr);
+        $product = [];
+      foreach ($request->product as $key => $value1) {
+            $product[]=['product'=>$value1->uuid,'quantity'=>$value->quantity];
+
+      }
         $products= json_encode($product);
     		       $order=Order_status::where('title','pending_payment')->first();
             $order= Order::create(['user_id'=>Auth::user()->id,
@@ -94,6 +102,9 @@ class OrderController extends Controller
                                     'products'=>$products,
                                     'address'=>$address,
                                     'amount'=>$request->amount]);
+            return response()->json(['status'=>'success',
+                                      'message'=>'order created succefully'
+                                      'order'=>$order]);
     	}catch(Exception $e){
     		dd($e);
     	}
@@ -115,6 +126,11 @@ class OrderController extends Controller
                }
                  $address_arr = ['address'=>$request->address,'city'=>$request->city,'state'=>$request->state,'zip'=>$request->zip,'country'=>$request->country];        
         $address=json_encode($address_arr);
+        $product = [];
+      foreach ($request->product as $key => $value1) {
+            $product[]=['product'=>$value1->uuid,'quantity'=>$value->quantity];
+
+      }
         $products= json_encode($product);
                $order=Order_status::where('title','pending_payment')->first();
             $order= Order::where('uuid',$uuid)->update([
@@ -135,7 +151,7 @@ class OrderController extends Controller
            $products = json_decode($order->products);
            $prod_uuid = [];
            foreach ($products as $key => $value) {
-             $prod_uuid[]=$value->products;
+             $prod_uuid[]=$value->product;
            }
            $products_ar = DB::table('products')
                            ->select('products.title','products.description','products.metadata','products.price','categories.title','brands.title','files.path')
@@ -144,7 +160,7 @@ class OrderController extends Controller
                             ->join('files','products.metadata->image','=','files.uuid')
                             ->whereIn('uuid',$prod_uuid)
                             ->get();
-                    $order['products']=>$products_ar;        
+                    $order['products']=$products_ar;        
             return response()->json(['status'=>'success','order'=>$order]);
       }catch(Exception $e){
         dd($e);
@@ -156,7 +172,7 @@ class OrderController extends Controller
       try{
            $order=Order::where('uuid',$uuid)->delete();
            return response()->json(['status'=>'success',
-                                    'order'=>'rder deleted succefully'])
+                                    'order'=>'rder deleted succefully']);
       }catch(Exception $e){
         dd($e);
       }

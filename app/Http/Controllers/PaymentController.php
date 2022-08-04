@@ -126,7 +126,7 @@ class PaymentController extends Controller
     	$payment_update->details=$details;
     	$payment_update->save();
                                                   
-             if(!empty($payment_save)){
+             if(!empty($payment_update)){
              	Orders::where('user_id',Auth::user()->id)
              	         ->where('order_status_id','2')->update(['payment_id'=>$payment_create->id]);
              }
@@ -162,7 +162,7 @@ class PaymentController extends Controller
          }
     }
 
-    public function category_index()
+    public function payment_index()
     {
     	try{
              $payment = Payment::orderBy('type')->paginate(10);
