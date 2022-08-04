@@ -17,15 +17,16 @@ class ProductController extends Controller
     			'category_uuid'=>'required',
                 'title' => 'required',
                 'price'=>'required|numeric',
-                'description'=>'required',
-                'metadata'=>'required|json'
+                'description'=>'required'
             );
              $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
             $uuid = Str::uuid(10)->toString();
-            $metadata = json_encode($request->metadata);
+             $image = File::orderBy('id', 'desc')->last();
+              $brand = Brand::orderBy('id', 'desc')->last();
+            $metadata = json_encode(['image'=>$image->uuid,'brand'=>$brand->uuid]);
     		$category_create = Product::create([
                 'uuid'=>$uuid,
     			'category_uuid'=>$request->category_uuid
@@ -49,13 +50,15 @@ class ProductController extends Controller
     			'category_uuid'=>'required',
                 'title' => 'required',
                 'price'=>'required|numeric',
-                'description'=>'required',
-                'metadata'=>'required|json'
+                'description'=>'required'
             );
              $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
-            } $metadata = json_encode($request->metadata);
+            } 
+             $image = File::orderBy('updated_at', 'desc')->first();
+              $brand = Brand::orderBy('updated_at', 'desc')->first();
+            $metadata = json_encode(['image'=>$image->uuid,'brand'=>$brand->uuid]);
                 $product_update = Product::where('uuid',$uuid)->first();
                 $product_update->title = $request->title;
                 $product_update->price=$request->price;
@@ -71,7 +74,9 @@ class ProductController extends Controller
     public function product_show($uuid)
     {
          try{
-             $product = Product::where('uuid',$uuid)->first();
+            $product= \DB::table('products')
+                           ->select('products.title','products.description','products.metadata','products.price','categories.title')
+                            ->join('categories','products.category_id','=','categories.id')->where('uuid',$uuid)->first()
               return response()->json(['status'=>'success',
                                          'product'=>$product]);
          }catch(Exception $e){
@@ -91,11 +96,13 @@ class ProductController extends Controller
          }
     }
 
-    public function category_index()
+    public function product_index()
     {
     	try{
              $product = Product::orderBy('title')->paginate(10);
-             
+             $product= \DB::table('products')
+                           ->select('products.title','products.description','products.metadata','products.price','categories.title')
+                            ->join('categories','products.category_id','=','categories.id')->orderBy('title')->paginate(10);
               return response()->json(['status'=>'success',
                                          'product'=>$product]);
          }catch(Exception $e){

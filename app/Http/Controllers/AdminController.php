@@ -83,20 +83,9 @@ class AdminController extends Controller
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
 
             }
-            // $filename='';
-            // if($request->hasfile('avatar')) 
-            // { 
-            //   $file = $request->file('avatar');
-            //   $extension = $file->getClientOriginalExtension(); // getting image extension
-            //   $size=$file->getSize()
-            //   $filename =time().'.'.$extension;
-            //   $path = public_path().'/admin/images/';
-            //   $uuid = Str::uuid()->toString();
-            //   $file->move($path, $filename);
-
-            // }
+            
              $uuid = Str::uuid(10)->toString();
-            // dd($uuid);
+            $avatar = File::orderBy('id', 'desc')->last();
              $password = Hash::make($request->password);
            $user_create = User::create([
             'uuid'=>$uuid,
@@ -105,7 +94,7 @@ class AdminController extends Controller
             'email'=>$request->email,
             'password'=>$password,
              'address'=>$request->address,
-             'avatar'=>1,
+             'avatar'=>$avatar->uuid,
              'phone_number'=>$request->phone_number,
              'is_admin'=>1,
              'is_marketing'=>1
