@@ -12,7 +12,7 @@ class FilesController extends Controller
 {
     public function upload(Request $request)
     {
-         dd($request->file);
+         //dd($request->file);
          try{
              $rules = array(
                 'file' =>'required|mimes:jpg,jpeg,png,bmp,tiff',
