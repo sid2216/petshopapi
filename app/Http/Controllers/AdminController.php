@@ -19,7 +19,9 @@ class AdminController extends Controller
 
     public function login(Request $request)
     {
+
         try{
+            
      $rules = array(
                 'email' => 'required|email',
                 'password' => 'required',
@@ -42,7 +44,7 @@ class AdminController extends Controller
             	return response()->json([
             		'status'=>'success',
             	      'user'=>$user,
-            	      'authorisation'=>['token'=>$token,
+            	      'authorization'=>['token'=>$token,
             	       'type'=>'Bearer']
             	   ]);
 
@@ -52,7 +54,7 @@ class AdminController extends Controller
             }   
     }
 
-    public function logout()
+    public function admin_logout()
     {
         Auth::logout();
         return response()->json([
@@ -61,15 +63,15 @@ class AdminController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function register(Request $request)
     {
-
+         //dd($request->all());
        $rules = array(
                 'first_name'=>'required',
                 'last_name'=>'required',
                 'address'=>'required',
                 'avatar'=>'required',
-                'phone_number'=>'required',
+                'phone_number'=>'required|numeric',
                 'email' => 'required|email',
                 'password' => 'required',
                 'password_confirmation'=>'required|same:password'
@@ -81,35 +83,28 @@ class AdminController extends Controller
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
 
             }
-            // $filename='';
-            // if($request->hasfile('avatar')) 
-            // { 
-            //   $file = $request->file('avatar');
-            //   $extension = $file->getClientOriginalExtension(); // getting image extension
-            //   $size=$file->getSize()
-            //   $filename =time().'.'.$extension;
-            //   $path = public_path().'/admin/images/';
-            //   $uuid = Str::uuid()->toString();
-            //   $file->move($path, $filename);
-
-            // }
+            
+             $uuid = Str::uuid(10)->toString();
+            $avatar = File::orderBy('id', 'desc')->first();
+             $password = Hash::make($request->password);
            $user_create = User::create([
+            'uuid'=>$uuid,
            	'first_name'=>$request->first_name,
             'last_name' =>$request->last_name,
             'email'=>$request->email,
-            'password'=>$request->password,
+            'password'=>$password,
              'address'=>$request->address,
-             'avatar'=>1,
+             'avatar'=>$avatar->uuid,
              'phone_number'=>$request->phone_number,
-             'is_admin'=>0,
-             'is_marketing'=>0
+             'is_admin'=>1,
+             'is_marketing'=>1
                ]);
            $token = Auth::login($user_create);
            return response()->json([
                   'status'=>'success',
                   'message'=>'user created successfully',
                   'user'=>$user_create,
-                  'authorisation'=>['token'=>$token,
+                  'authorization'=>['token'=>$token,
                                      'type'=>'Bearer']
            ]);
     }
@@ -147,15 +142,19 @@ class AdminController extends Controller
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
 
             }
-             $user_update = User::find('uuid',$uuid);
+            $uuid = Str::uuid(10)->toString();
+            $avatar = File::orderBy('id', 'desc')->first();
+             $password = Hash::make($request->password);
+             $user_update = User::where('uuid',$uuid)->first();
+            $user_update->uuid = $uuid;
              $user_update->first_name = $request->first_name;
              $user_update->last_name =$request->last_name;
              $user_update->email =$request->email;
              $user_update->password = $request->password;
              $user_update->address =$request->address;
-             $user_update->avatar  =$avatar;
-             $user_update->is_admin  = 0;
-             $user_update->is_marketing =0;
+             $user_update->avatar  =$avatar->uuid;
+             $user_update->is_admin  = 1;
+             $user_update->is_marketing =1;
              $user_update->save();
           
           return response()->json([
@@ -171,7 +170,7 @@ class AdminController extends Controller
 
     public function destroy($uuid)
     {
-        $user = User::find('uuid',$uuid);
+        $user = User::where('uuid',$uuid)->first();
         $user->delete();
 
         return response()->json([

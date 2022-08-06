@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Order_status;
+use App\Models\Order_status;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class OrderStatusController extends Controller
 {
@@ -18,17 +20,18 @@ class OrderStatusController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
-            
-    		$orderstatus_create = Order_status::create(['title'=>$request->title]);
+            //dd("ok");
+             $uuid = Str::uuid(10)->toString();
+    		$orderstatus_create = Order_status::create(['title'=>$request->title,'uuid'=>$uuid]);
             return response()->json(['status'=>'success',
-                                      'message'=>'orderstatus created succesfully']);  
+                                      'message'=>'orderstatus created succesfully','orderstatus_create'=>$orderstatus_create]);  
     	}catch(Exception $e){
              dd($e);
     	}
     }
-    }
+    
 
-    public function edit_orderstatus($uuid)
+    public function edit_orderstatus(Request $request,$uuid)
     {
     	try{
               $rules = array(
@@ -38,11 +41,11 @@ class OrderStatusController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
                   }
-                $orderstatus_update = Order_status::find('uuid',$uuid);
+                $orderstatus_update = Order_status::where('uuid',$uuid)->first();
                 $orderstatus_update->title = $request->title;
                 
                 $orderstatus_update->save();
-                return response()->json(['status'=>'success','orderstatus'=>$orderstatus,'message'=>'orderstatus updated successfully']);
+                return response()->json(['status'=>'success','orderstatus'=>$orderstatus_update,'message'=>'orderstatus updated successfully']);
     	}catch(Exception $e){
     		dd($e);
     	}
@@ -51,7 +54,7 @@ class OrderStatusController extends Controller
     public function orderstatus_show($uuid)
     {
          try{
-             $orderstatus = Order_status::find('uuid',$uuid);
+             $orderstatus = Order_status::where('uuid',$uuid)->first();
               return response()->json(['status'=>'success',
                                          'orderstatus'=>$orderstatus]);
          }catch(Exception $e){
@@ -62,7 +65,7 @@ class OrderStatusController extends Controller
     public function delete_orderstatus($uuid)
     {
     	try{
-             $orderstatus = Order_status::find('uuid',$uuid);
+             $orderstatus = Order_status::where('uuid',$uuid)->first();
              $orderstatus->delete();
               return response()->json(['status'=>'success',
                                          'message'=>'orderstatus deleted succefully']);
@@ -74,7 +77,7 @@ class OrderStatusController extends Controller
     public function orderstatus_index()
     {
     	try{
-             $orderstatus = Order_status::all()->orderBy('title')->paginate(10);
+             $orderstatus = Order_status::orderBy('title')->paginate(10);
               return response()->json(['status'=>'success',
                                          'orderstatus'=>$orderstatus]);
          }catch(Exception $e){

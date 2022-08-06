@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Brand;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use URL;
 
 class BrandController extends Controller
 {
@@ -17,18 +20,22 @@ class BrandController extends Controller
              $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
+            }
+                $uuid = Str::uuid(10)->toString();
             $slug =str_replace(" ","-",$request->title);
     		$brand_create = Brand::create(['title'=>$request->title,
-    	                                         'slug'=>$slug]);
+    	                                         'slug'=>$slug,
+                                                 'uuid'=>$uuid]);
             return response()->json(['status'=>'success',
+                                    'brand'=>$brand_create,
                                       'message'=>'brand created succesfully']);  
     	}catch(Exception $e){
              dd($e);
     	}
     }
-    }
+    
 
-    public function edit_brand($uuid)
+    public function edit_brand(Request$request,$uuid)
     {
     	try{
               $rules = array(
@@ -38,7 +45,7 @@ class BrandController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
                   }
-                $brand_update = Brand::find('uuid',$uuid);
+                $brand_update = Brand::where('uuid',$uuid)->first();
                 $brand_update->title = $request->tilte;
                 $brand_update->slug=str_replace(" ","-",$request->title);
                 $brand_update->save();
@@ -51,7 +58,8 @@ class BrandController extends Controller
     public function brand_show($uuid)
     {
          try{
-             $brand = Brand::find('uuid',$uuid);
+            
+             $brand = Brand::where('uuid',$uuid)->first();
               return response()->json(['status'=>'success',
                                          'brand'=>$brand]);
          }catch(Exception $e){
@@ -62,7 +70,7 @@ class BrandController extends Controller
     public function delete_brand($uuid)
     {
     	try{
-             $brand = Brand::find('uuid',$uuid);
+             $brand = Brand::where('uuid',$uuid)->first();
              $brand->delete();
               return response()->json(['status'=>'success',
                                          'message'=>'brand deleted succefully']);
@@ -74,10 +82,10 @@ class BrandController extends Controller
     public function brand_index()
     {
     	try{
-             $brand = Brand::all()->orderBy('title')->paginate(10);
-             $brand->delete();
+
+             $brand = Brand::orderBy('title')->paginate(10);
               return response()->json(['status'=>'success',
-                                         'message'=>'brand deleted succefully']);
+                                         'brand'=>$brand]);
          }catch(Exception $e){
              dd($e);
          }

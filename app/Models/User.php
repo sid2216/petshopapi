@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Support\Str;
+//use App\Traits\Uuid;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -19,9 +21,16 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+    	'uuid',
+        'first_name',
+        'last_name',
+        'address',
         'email',
         'password',
+        'phone_number',
+         'avatar',
+         'is_admin',
+         'is_marketing'
     ];
 
     /**
@@ -42,7 +51,15 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+       
+    //  protected static function boot()
+    // {
+    //     parent::boot();
 
+    //     static::creating(function ($model) {
+    //         $model->{$model->getKeyName()} = Str::uuid()->toString();
+    //     });
+    // }
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -54,6 +71,6 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function orders(){
-        $this->hasMany(Order::class);
+       return $this->hasMany(Order::class,'user_id');
     }
 }

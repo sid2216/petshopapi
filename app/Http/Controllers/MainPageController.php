@@ -10,7 +10,7 @@ class MainPageController extends Controller
     public function index_promotions()
     {   
     	try{
-    	$promotions = Promotion::all()->orderBy('title')->paginate(10);
+    	$promotions = Promotion::orderBy('title')->paginate(10);
     	return response()->json([
     	                   'status'=>'success',
     	                    'promotions'=>$promotions]);
@@ -22,7 +22,7 @@ class MainPageController extends Controller
     public function index_blog()
     {
     	try{
-             $post = Post::all()->orderBy('title')->paginate(10);
+             $post = Post::orderBy('title')->paginate(10);
     	return response()->json([
     	                   'status'=>'success',
     	                    'post'=>$post]);
@@ -34,7 +34,7 @@ class MainPageController extends Controller
     public function show_post($uuid)
     {
          try{
-         	$post = Post::find('uuid',$uuid);
+         	$post = Post::where('uuid',$uuid)->first();
          	return response()->json(['status'=>'success',
                                      'post'=>$post]);
          }catch(Exception $e){

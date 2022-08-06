@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Models\User;
+use App\Files;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -52,7 +58,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function create()
+    public function register()
     {
        $rules = array(
                 'email' => 'required|email',
@@ -71,25 +77,16 @@ class UserController extends Controller
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
 
             }
-            $filename='';
-            if($request->hasfile('avatar')) 
-            { 
-              $file = $request->file('avatar');
-              $extension = $file->getClientOriginalExtension(); // getting image extension
-              $size=$file->getSize()
-              $filename =time().'.'.$extension;
-              $path = public_path().'/admin/images/';
-              $uuid = Str::uuid()->toString();
-              $file->move($path, $filename);
-
-            }
+           $avatar = File::orderBy('id', 'desc')->first();
+             $password = Hash::make($request->password);
            $user_create = User::create([
+            'uuid'=>$request->uuid,
            	'first_name'=>$request->first_name,
             'last_name' =>$request->last_name,
             'email'=>$request->email,
-            'password'=>$request->password,
+            'password'=>$password,
              'address'=>$request->address,
-             'avatar'=>$avatar_id,
+             'avatar'=>$avatar->uuid,
              'phone_number'=>$request->phone_number,
              'is_admin'=>0,
              'is_marketing'=>0
@@ -126,11 +123,13 @@ class UserController extends Controller
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
 
             }
-             $user_update = User::find('uuid',$uuid);
+            $avatar = File::orderBy('id', 'desc')->first();
+             $password = Hash::make($request->password);
+             $user_update = User::where('uuid',$uuid)->first();
              $user_update->first_name = $request->first_name;
              $user_update->last_name =$request->last_name;
              $user_update->email =$request->email;
-             $user_update->password = $request->password;
+             $user_update->password = $password;
              $user_update->address =$request->address;
              $user_update->avatar  =$avatar;
              $user_update->is_admin  = 0;
@@ -212,9 +211,34 @@ class UserController extends Controller
              $user_update->save();
              $password_rest=Password_rest::create(['email'=>$request->email,
                                                'token'=>$request->token]);
+             return response()->json(['status'=>'success',
+                                       'password'=>'password reset succefully']);
 
        }catch(Exception $e){
        	dd($e);
        }
+    } 
+    public function user_orders()
+    {
+       try{
+       $order = Order::where('user_id',Auth::user()->id)->first();
+           $products = json_decode($order->products);
+           $prod_uuid = [];
+           foreach ($products as $key => $value) {
+             $prod_uuid[]=$value->product;
+           }
+           $products_ar = DB::table('products')
+                           ->select('products.title','products.description','products.metadata','products.price','categories.title','brands.title','files.path')
+                            ->join('categories','products.category_id','=','categories.id')
+                            ->join('brands','products.metadata->brand','=','brands.uuid')
+                            ->join('files','products.metadata->image','=','files.uuid')
+                            ->whereIn('products.uuid',$prod_uuid)
+                            ->get();
+                    $order['products']=$products_ar; 
+               return response()->json(['status'=>'success',
+                                        'order'=>$order]);     
+        }catch(Exception $e){
+            dd($e);
+        }
     }
 }
