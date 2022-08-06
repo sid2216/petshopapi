@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 // });
 Route::post('/v1/admin/login','App\Http\Controllers\AdminController@login');
 Route::post('/v1/admin/create','App\Http\Controllers\AdminController@register');
+
+
 Route::group(['middleware' => ['auth:api', 'admin']], function () {
 	Route::post('/v1/admin/logout','App\Http\Controllers\AdminController@admin_logout');
 Route::get('/v1/admin/user-listing','App\Http\Controllers\AdminController@user_listing');
@@ -61,13 +63,15 @@ Route::put('/v1/payments/{uuid}','App\Http\Controllers\PaymentController@edit_pa
 Route::get('/v1/payments/{uuid}','App\Http\Controllers\PaymentController@payment_show');
 Route::delete('/v1/payments/{uuid}','App\Http\Controllers\PaymentController@delete_payment');
 //files----------
-Route::get('/v1/file/upload','App\Http\Controllers\FilesController@upload');
-Route::post('/v1/file/{uuid}','App\Http\Controllers\FilesControllerController@getfile');
+
 });
 //admin routes
 
 Route::post('/v1/user/create','App\Http\Controllers\UserController@register');
 Route::post('/v1/user/login','App\Http\Controllers\UserController@login');
+Route::post('/v1/file/upload','App\Http\Controllers\FilesController@upload');
+Route::get('/v1/file/{uuid}','App\Http\Controllers\FilesController@getfile');
+
 Route::group(['middleware' => ['auth:api']], function () {
 
 //user routes

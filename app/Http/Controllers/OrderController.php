@@ -182,7 +182,7 @@ class OrderController extends Controller
 
     public function invoice_order($uuid){
       try{
-           $order = \DB::select('orders.user_id','orders.order_status_id','orders.payment_id','orders.products','orders.address','orders.user_id','orders.user_id',)
+           $order = \DB::select('orders.user_id','orders.order_status_id','orders.payment_id','orders.products','orders.address','orders.user_id','orders.user_id');
 
            $products = json_decode($order->products);
            $prod_uuid = [];
