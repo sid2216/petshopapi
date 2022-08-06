@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Order_status;
+use App\Models\Order_status;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -20,10 +20,11 @@ class OrderStatusController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
+            //dd("ok");
              $uuid = Str::uuid(10)->toString();
     		$orderstatus_create = Order_status::create(['title'=>$request->title,'uuid'=>$uuid]);
             return response()->json(['status'=>'success',
-                                      'message'=>'orderstatus created succesfully','$orderstatus_create'=>$orderstatus_create]);  
+                                      'message'=>'orderstatus created succesfully','orderstatus_create'=>$orderstatus_create]);  
     	}catch(Exception $e){
              dd($e);
     	}

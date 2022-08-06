@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use App\Models\Orders;
+use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 class PaymentController extends Controller
 {
@@ -18,6 +18,7 @@ class PaymentController extends Controller
     {
     	try{
     		$uuid = Str::uuid(10)->toString();
+            $details='';
     		if(empty($request->type)){
     			return response()->json(['status'=>false,'error'=>'Payment type rquired']);
     		}
@@ -34,8 +35,8 @@ class PaymentController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
-            $details = json_encode(["holder_name"=>$request->holder_name,"number"=> $request->number,
-    		"ccv"=>$request->ccv,"expire_date"=>$request->expire_date]);
+            $details = json_encode(array("holder_name"=>$request->holder_name,"number"=> $request->number,
+    		"ccv"=>$request->ccv,"expire_date"=>$request->expire_date));
        }elseif($type=='cash_on_delivary'){
        	$rules = array(
                 'first_name' => 'required',
@@ -46,7 +47,7 @@ class PaymentController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
-       	$cash_on_delivary = json_encode(["first_name"=>$request->first_name,"last_name"=> $request->last_name,"address"=> $request->address]);
+       	$details = json_encode(array("first_name"=>$request->first_name,"last_name"=> $request->last_name,"address"=>$request->address));
        }elseif($type=='bank_transfer') {
        		$rules = array(
                 'swift' => 'required',
@@ -57,14 +58,14 @@ class PaymentController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
-       	$details = json_encode(["swift"=> $request->swift,"iban"=>$request->iban,"name"=>$request->name]);
+       	$details = json_encode(array("swift"=> $request->swift,"iban"=>$request->iban,"name"=>$request->name));
        }
     	
         $payment_create = Payment::create(['type'=>$type,
     	                                         'details'=>$details,
                                                    'uuid'=>$uuid]);
              if(!empty($payment_create)){
-             	Orders::where('user_id',Auth::user()->id)
+             	Order::where('user_id',Auth::user()->id)
              	         ->where('order_status_id','2')->update(['payment_id'=>$payment_create->id]);
              }
             return response()->json(['status'=>'success',
@@ -83,7 +84,8 @@ class PaymentController extends Controller
     			return response()->json(['status'=>false,'error'=>'Payment type rquired']);
     		}
              $type = str_replace(" ","_",strtolower($request->type));
-
+             //dd($type);
+             $details="";
              if($type=='credit_card'){
            $rules = array(
                 'holder_name' => 'required',
@@ -95,9 +97,10 @@ class PaymentController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
-            $details = json_encode(["holder_name"=>$request->holder_name,"number"=> $request->number,
-    		"ccv"=>$request->ccv,"expire_date"=>$request->expire_date]);
+            $details = json_encode(array("holder_name"=>$request->holder_name,"number"=> $request->number,
+    		"ccv"=>$request->ccv,"expire_date"=>$request->expire_date));
        }elseif($type=='cash_on_delivary'){
+        //dd($type);
        	$rules = array(
                 'first_name' => 'required',
                 'last_name'=>'required',
@@ -107,7 +110,7 @@ class PaymentController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
-       	$cash_on_delivary = json_encode(["first_name"=>$request->first_name,"last_name"=> $request->last_name,"address"=> $request->address]);
+       	$details = json_encode(array("first_name"=>$request->first_name,"last_name"=> $request->last_name,"address"=> $request->address));
        }elseif($type=='bank_transfer') {
        		$rules = array(
                 'swift' => 'required',
@@ -118,17 +121,17 @@ class PaymentController extends Controller
             if ($validator->fails()) {
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
             }
-       	$details = json_encode(["swift"=> $request->swift,"iban"=>$request->iban,"name"=>$request->name]);
+       	$details = json_encode(array("swift"=> $request->swift,"iban"=>$request->iban,"name"=>$request->name));
        }
-    	
+    	//dd($details);
         $payment_update = Payment::where('uuid',$uuid)->first();
     	$payment_update->type=$type;
     	$payment_update->details=$details;
     	$payment_update->save();
                                                   
              if(!empty($payment_update)){
-             	Orders::where('user_id',Auth::user()->id)
-             	         ->where('order_status_id','2')->update(['payment_id'=>$payment_create->id]);
+             	Order::where('user_id',Auth::user()->id)
+             	         ->where('order_status_id','2')->update(['payment_id'=>$payment_update->id]);
              }
             return response()->json(['status'=>'success',
                                        'payment'=>$payment_update,
@@ -142,7 +145,6 @@ class PaymentController extends Controller
     {
          try{
              $payment = Payment::where('uuid',$uuid)->first();
-             $payment['details']=json_decode($payment->details);
               return response()->json(['status'=>'success',
                                         'payment'=>$payment]);
          }catch(Exception $e){
@@ -166,7 +168,6 @@ class PaymentController extends Controller
     {
     	try{
              $payment = Payment::orderBy('type')->paginate(10);
-             $payment['details']=json_decode($payment->details);
               return response()->json(['status'=>'success',
                                          'payment'=>$payment]);
          }catch(Exception $e){

@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 //admin routes
 Route::post('/v1/admin/login','App\Http\Controllers\AdminController@login');
@@ -30,7 +30,7 @@ Route::delete('/v1/admin/user-delete/{uuid}','App\Http\Controllers\AdminControll
 //user routes
 Route::get('/v1/user','UserController@show');
 Route::delete('/v1/user','App\Http\Controllers\UserController@destroy');
-Route::get('/v1/user/orders','App\Http\Controllers\UserController@_user_orders');
+Route::get('/v1/user/orders','App\Http\Controllers\UserController@user_orders');
 Route::post('/v1/user/create','App\Http\Controllers\UserController@create');
 Route::post('/v1/user/forgot-password','App\Http\Controllers\UserController@forget_password');
 Route::post('/v1/user/login','App\Http\Controllers\UserController@login');
@@ -48,19 +48,19 @@ Route::get('/v1/main/blog','App\Http\Controllers\MainPageController@index_promot
 Route::get('/v1/main/blog/{uuid}','App\Http\Controllers\MainPageController@index_blog');
 Route::get('/v1/main/promotions','App\Http\Controllers\MainPageController@show_post');
 //product route 
-Route::post('/v1/product/create','ProductController@create');
-Route::put('/v1/product/{uuid}','ProductController@edit_product');
-Route::get('/v1/product/{uuid}','ProductController@product_show');
-Route::delete('/v1/product/{uuid}','ProductController@delete_product');
-Route::get('/v1/products','ProductController@category_index');
+Route::post('/v1/product/create','App\Http\Controllers\ProductController@create');
+Route::put('/v1/product/{uuid}','App\Http\Controllers\ProductController@edit_product');
+Route::get('/v1/product/{uuid}','App\Http\Controllers\ProductController@product_show');
+Route::delete('/v1/product/{uuid}','App\Http\Controllers\ProductController@delete_product');
+Route::get('/v1/products','App\Http\Controllers\ProductController@product_index');
 //order route
 Route::get('/v1/orders','App\Http\Controllers\OrderController@all_order_list');
 Route::get('/v1/orders/shipment-locator','App\Http\Controllers\OrderController@shipment_locator');
 Route::get('/v1/orders/dashboard','App\Http\Controllers\OrderController@dashboard_order');
- Route::post('/v1/brand/create','App\Http\Controllers\OrderController@create_order');
- Route::put('/v1/brand/{uuid}','App\Http\Controllers\OrderController@edit_order');
- Route::get('/v1/brand/{uuid}','App\Http\Controllers\OrderController@show_order');
- Route::delete('/v1/brand/{uuid}','App\Http\Controllers\OrderController@delete_order');
+ Route::post('/v1/order/create','App\Http\Controllers\OrderController@create_order');
+ Route::put('/v1/order/{uuid}','App\Http\Controllers\OrderController@edit_order');
+ Route::get('/v1/order/{uuid}','App\Http\Controllers\OrderController@show_order');
+ Route::delete('/v1/order/{uuid}','App\Http\Controllers\OrderController@delete_order');
 //brand route
 Route::get('/v1/brands','App\Http\Controllers\BrandController@brand_index');
 Route::post('/v1/brand/create','App\Http\Controllers\BrandController@create');
@@ -68,13 +68,13 @@ Route::put('/v1/brand/{uuid}','App\Http\Controllers\BrandController@edit_brand')
 Route::get('/v1/brand/{uuid}','App\Http\Controllers\BrandController@brand_show');
 Route::delete('/v1/brand/{uuid}','App\Http\Controllers\BrandController@delete_brand');
 //Order Status-------
-Route::get('/v1/brands','App\Http\Controllers\OrderStatusController@create');
+Route::get('/v1/order-statuses','App\Http\Controllers\OrderStatusController@orderstatus_index');
 Route::post('/v1/order-status/create','App\Http\Controllers\OrderStatusController@create');
 Route::put('/v1/order-status/{uuid}','App\Http\Controllers\OrderStatusController@edit_orderstatus');
 Route::get('/v1/order-status/{uuid}','App\Http\Controllers\OrderStatusController@orderstatus_show');
 Route::delete('/v1/order-status/{uuid}','App\Http\Controllers\OrderStatusController@delete_orderstatus');
 //Payment ------
-Route::get('api/v1/payments','App\Http\Controllers\PaymentController@payment_index');
+Route::get('/v1/payments','App\Http\Controllers\PaymentController@payment_index');
 Route::post('/v1/payments/create','App\Http\Controllers\PaymentController@create');
 Route::put('/v1/payments/{uuid}','App\Http\Controllers\PaymentController@edit_payment');
 Route::get('/v1/payments/{uuid}','App\Http\Controllers\PaymentController@payment_show');

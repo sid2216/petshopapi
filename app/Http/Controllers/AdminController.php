@@ -85,7 +85,7 @@ class AdminController extends Controller
             }
             
              $uuid = Str::uuid(10)->toString();
-            $avatar = File::orderBy('id', 'desc')->last();
+            $avatar = File::orderBy('id', 'desc')->first();
              $password = Hash::make($request->password);
            $user_create = User::create([
             'uuid'=>$uuid,
@@ -142,15 +142,19 @@ class AdminController extends Controller
                 return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
 
             }
+            $uuid = Str::uuid(10)->toString();
+            $avatar = File::orderBy('id', 'desc')->first();
+             $password = Hash::make($request->password);
              $user_update = User::where('uuid',$uuid)->first();
+            $user_update->uuid = $uuid;
              $user_update->first_name = $request->first_name;
              $user_update->last_name =$request->last_name;
              $user_update->email =$request->email;
              $user_update->password = $request->password;
              $user_update->address =$request->address;
-             $user_update->avatar  =1;
-             $user_update->is_admin  = 0;
-             $user_update->is_marketing =0;
+             $user_update->avatar  =$avatar->uuid;
+             $user_update->is_admin  = 1;
+             $user_update->is_marketing =1;
              $user_update->save();
           
           return response()->json([

@@ -5,6 +5,9 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Order_status;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 use DB;
 class OrderController extends Controller
 {
@@ -86,24 +89,24 @@ class OrderController extends Controller
                if ($validator->fails()) {
                    return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
                }
-                 $address_arr = ['address'=>$request->address,'city'=>$request->city,'state'=>$request->state,'zip'=>$request->zip,'country'=>$request->country];        
+                 $address_arr = array('address'=>$request->address,'city'=>$request->city,'state'=>$request->state,'zip'=>$request->zip,'country'=>$request->country);        
     		$address=json_encode($address_arr);
-        $product = [];
-      foreach ($request->product as $key => $value1) {
-            $product[]=['product'=>$value1->uuid,'quantity'=>$value->quantity];
-
-      }
+        $product = array();
+      foreach ($request->product as $key=> $value1) {
+              $product[]=array('product'=>$value1['product'],'quantity'=>$value1['quantity']); }
         $products= json_encode($product);
+        
     		       $order=Order_status::where('title','pending_payment')->first();
+             // dd($products);
             $order= Order::create(['user_id'=>Auth::user()->id,
                                      'uuid'=>$uuid,
                                    'order_status_id'=>$order->id,
-                                    'payment_uuid'=>$request->payment_uuid,
                                     'products'=>$products,
                                     'address'=>$address,
                                     'amount'=>$request->amount]);
+
             return response()->json(['status'=>'success',
-                                      'message'=>'order created succefully'
+                                      'message'=>'order created succefully',
                                       'order'=>$order]);
     	}catch(Exception $e){
     		dd($e);
@@ -124,11 +127,11 @@ class OrderController extends Controller
                if ($validator->fails()) {
                    return response()->json(['status'=>false,'error'=>$validator->errors()], 200);
                }
-                 $address_arr = ['address'=>$request->address,'city'=>$request->city,'state'=>$request->state,'zip'=>$request->zip,'country'=>$request->country];        
+                 $address_arr = array('address'=>$request->address,'city'=>$request->city,'state'=>$request->state,'zip'=>$request->zip,'country'=>$request->country);        
         $address=json_encode($address_arr);
         $product = [];
       foreach ($request->product as $key => $value1) {
-            $product[]=['product'=>$value1->uuid,'quantity'=>$value->quantity];
+            $product[]=array('product'=>$value1['product'],'quantity'=>$value1['quantity']);
 
       }
         $products= json_encode($product);
@@ -137,7 +140,6 @@ class OrderController extends Controller
                                     'user_id'=>Auth::user()->id,
                                      'uuid'=>$uuid,
                                    'order_status_id'=>$order->id,
-                                    'payment_uuid'=>$request->payment_uuid,
                                     'products'=>$products,
                                     'address'=>$address,
                                     'amount'=>$request->amount]);
@@ -158,7 +160,7 @@ class OrderController extends Controller
                             ->join('categories','products.category_id','=','categories.id')
                             ->join('brands','products.metadata->brand','=','brands.uuid')
                             ->join('files','products.metadata->image','=','files.uuid')
-                            ->whereIn('uuid',$prod_uuid)
+                            ->whereIn('products.uuid',$prod_uuid)
                             ->get();
                     $order['products']=$products_ar;        
             return response()->json(['status'=>'success','order'=>$order]);
@@ -172,7 +174,30 @@ class OrderController extends Controller
       try{
            $order=Order::where('uuid',$uuid)->delete();
            return response()->json(['status'=>'success',
-                                    'order'=>'rder deleted succefully']);
+                                    'order'=>'order deleted succefully']);
+      }catch(Exception $e){
+        dd($e);
+      }
+    }
+
+    public function invoice_order($uuid){
+      try{
+           $order = \DB::select('orders.user_id','orders.order_status_id','orders.payment_id','orders.products','orders.address','orders.user_id','orders.user_id',)
+
+           $products = json_decode($order->products);
+           $prod_uuid = [];
+           foreach ($products as $key => $value) {
+             $prod_uuid[]=$value->product;
+           }
+           $products_ar = DB::table('products')
+                           ->select('products.title','products.description','products.metadata','products.price','categories.title','brands.title','files.path')
+                            ->join('categories','products.category_id','=','categories.id')
+                            ->join('brands','products.metadata->brand','=','brands.uuid')
+                            ->join('files','products.metadata->image','=','files.uuid')
+                            ->whereIn('products.uuid',$prod_uuid)
+                            ->get();
+                    $order['products']=$products_ar;        
+            return response()->json(['status'=>'success','order'=>$order]);
       }catch(Exception $e){
         dd($e);
       }
