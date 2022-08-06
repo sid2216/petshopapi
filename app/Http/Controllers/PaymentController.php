@@ -10,10 +10,10 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 class PaymentController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api');
+    // }
     public function create(Request $request)
     {
     	try{

@@ -9,10 +9,10 @@ use Illuminate\Support\Str;
 class CategoryController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware('auth:api');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api');
+    // }
     public function create(Request $request)
     {
     	try{

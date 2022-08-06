@@ -3,6 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Models\User;
+use App\Files;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -52,7 +59,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function create()
+    public function register()
     {
        $rules = array(
                 'email' => 'required|email',
